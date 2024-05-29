@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -27,11 +28,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val mainScreenViewModel: MainScreenViewModel = ViewModelProvider(this).get(MainScreenViewModel::class.java)
         val imageState by mainScreenViewModel.currentState
-        val imageSelector = registerForActivityResult(ActivityResultContracts.GetContent()){
-            uri-> mainScreenViewModel._currentState.value = mainScreenViewModel._currentState.value.copy(
+        val imageSelector = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            mainScreenViewModel._currentState.value = mainScreenViewModel._currentState.value.copy(
                 currentImage = uri
             )
         }
+    fun retry():Unit{
+        mainScreenViewModel._currentState.value = mainScreenViewModel._currentState.value.copy(
+            currentImage = null
+        )
+    }
 
 //make enter screen UI
         //select image button
@@ -41,7 +47,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             EraseBGTheme {
-               MainScreen(imageState = imageState,imageSelector=imageSelector,mainScreenViewModel=mainScreenViewModel, context = this)
+//
+                MainScreen(
+                    imageState = imageState,
+                    imageSelector = imageSelector,
+                    mainScreenViewModel = mainScreenViewModel,
+                    context = this@MainActivity,
+                    mainScreenViewModel._currentState
+                )
             }
         }
     }

@@ -3,6 +3,14 @@ package com.harsh_kumar.erasebg.views
 import android.content.Context
 import android.net.Uri
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -37,15 +46,23 @@ import com.harsh_kumar.erasebg.models.ImageStateModel
 
 import com.harsh_kumar.erasebg.viewModels.MainScreenViewModel
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun MainScreen(imageState: ImageStateModel, imageSelector:ActivityResultLauncher<String>,mainScreenViewModel: MainScreenViewModel,context: Context){
-    if(imageState.imageBitmap!=null){
-        FinalScreen(imageState = imageState)
-    }else if(imageState.currentImage==null){
+fun MainScreen(imageState: ImageStateModel, imageSelector:ActivityResultLauncher<String>,mainScreenViewModel: MainScreenViewModel,context: Context, _currentState: MutableState<ImageStateModel>){
+    AnimatedContent(targetState = imageState,
+        transitionSpec= {
+            (slideInVertically { height -> height } + fadeIn()).with(slideOutVertically { height -> -height } + fadeOut())
+        }
+        ){
+
+    if(it.imageBitmap!=null){
+        FinalScreen(imageState = it,_currentState=_currentState)
+    }else if(it.currentImage==null){
         InitialScreen(imageSelector)
     }else{
-        SelectedImage(imageState,imageSelector,mainScreenViewModel,context)
+        SelectedImage(it,imageSelector,mainScreenViewModel,context)
     }
+        }
 }
 @Composable
 fun InitialScreen(imageSelector:ActivityResultLauncher<String>){
@@ -106,7 +123,7 @@ fun SelectedImage(imageState: ImageStateModel,imageSelector:ActivityResultLaunch
 }
 
 @Composable
-fun FinalScreen(imageState: ImageStateModel){
+fun FinalScreen(imageState: ImageStateModel,_currentState: MutableState<ImageStateModel>){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -119,11 +136,25 @@ fun FinalScreen(imageState: ImageStateModel){
 //            .clip(
 //                RoundedCornerShape(50f)
 //            ))
-        Image(
-            bitmap = imageState.imageBitmap!!.asImageBitmap(),
-            contentDescription = "some useful description",
-            modifier = Modifier.padding(20.dp).clip(RoundedCornerShape(20.dp))
-        )
+
+
+            Image(
+                bitmap = imageState.imageBitmap!!.asImageBitmap(),
+                contentDescription = "some useful description",
+                modifier = Modifier
+                    .padding(20.dp)
+                    .clip(RoundedCornerShape(20.dp))
+            )
+
+
+
+        Button(onClick = {
+                         _currentState.value=_currentState.value.copy(
+                             imageBitmap = null
+                         )
+        }, modifier = Modifier.padding(top=5.dp)) {
+            Text(text = "Back")
+        }
 
 
 
