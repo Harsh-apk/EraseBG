@@ -25,7 +25,7 @@ git clone https://github.com/Harsh-apk/EraseBG.git
 
 | Home Screen                      | Selected Image Screen             | Result Screen                     |
 |----------------------------------|-----------------------------------|-----------------------------------|
-| ![](/snaps/img.png)               | ![](/snaps/img_1.png)            | ![](/snaps/img_2.png)   |
+| ![](/snaps/img_1.png)            | ![](/snaps/img.png)               | ![](/snaps/img_2.png)   |
 
 
 
